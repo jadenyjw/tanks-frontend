@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactKonva, {Layer, Rect, Stage, Group} from 'react-konva';
 import Konva from 'konva';
+import Websocket from 'react-websocket';
 
 import GameCanvas from './Canvas/GameCanvas';
 import './App.css';
@@ -46,8 +47,11 @@ class App extends Component {
         }
    }
 
-
    
+    handleData(data) {
+      let result = JSON.parse(data);
+      window.alert('' + result);
+    }
 
   render() {
      const style = {
@@ -64,6 +68,8 @@ class App extends Component {
 
     return (
       <div className="App" style = {style} tabindex="0" >
+        <Websocket url='some url' 
+              onMessage={this.handleData.bind(this)}/>
         <Stage width={this.state.width * 0.9} height={this.state.width * 0.45} >
           <Layer>
               <GameCanvas width={this.state.width * 0.9} height={this.state.width * 0.45} p1x={this.state.p1x} p1y={this.state.p1y}/>

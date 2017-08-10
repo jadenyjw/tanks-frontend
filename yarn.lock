@@ -5015,6 +5015,10 @@ react-scripts@1.0.10:
   optionalDependencies:
     fsevents "1.1.2"
 
+react-websocket@^1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/react-websocket/-/react-websocket-1.1.7.tgz#0a761f3de354d4731f55343456e03b1f6005b492"
+
 react@^15.6.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/react/-/react-15.6.1.tgz#baa8434ec6780bde997cdc380b79cd33b96393df"
