@@ -47,7 +47,7 @@ class App extends Component {
         }
    }
 
-   
+
     handleData(data) {
       let result = JSON.parse(data);
       window.alert('' + result);
@@ -68,7 +68,7 @@ class App extends Component {
 
     return (
       <div className="App" style = {style} tabindex="0" >
-        <Websocket url='some url' 
+        <Websocket url='ws://127.0.0.1:8080' 
               onMessage={this.handleData.bind(this)}/>
         <Stage width={this.state.width * 0.9} height={this.state.width * 0.45} >
           <Layer>
