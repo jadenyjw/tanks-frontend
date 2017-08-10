@@ -68,7 +68,7 @@ class App extends Component {
 
     return (
       <div className="App" style = {style} tabindex="0" >
-        <Websocket url='ws://127.0.0.1:8080' 
+        <Websocket url='wss://tanks.ml/ws' 
               onMessage={this.handleData.bind(this)}/>
         <Stage width={this.state.width * 0.9} height={this.state.width * 0.45} >
           <Layer>
