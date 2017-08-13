@@ -78,6 +78,10 @@ var height = window.innerHeight;
 
 var Vel = 0;
 var Rotate = 0;
+var arrowX = 0;
+var arrowY = 0;
+var bVel = 0;
+var bulletDir = 0.5;
 
 
 var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
@@ -98,6 +102,15 @@ var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
       fill: 'black',
       stroke: 'black',
       strokeWidth: 4
+    });
+
+  var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
+      x: arrowX,
+      y: arrowY,
+      radius: 4,
+      fill: 'red',
+      stroke: 'black',
+      strokeWidth: 1
     });
 
     layer.add(arrow);
@@ -126,7 +139,31 @@ var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
     }, layer);
 
 
+
+    var animBullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Animation(function(frame) {
+        var x = bullet.getX();
+        var y = bullet.getY();
+        var rotation = bulletDir;
+        
+
+        x += bVel * Math.cos(rotation);
+        y += bVel * Math.sin(rotation);
+        bullet.setPosition({x:x, y:y});
+    }, layer);
+
+
     anim.start();
+
+    function shoot(){
+      var bulletX = arrow.getX();
+      var bulletY = arrow.getY();
+      bullet.setPosition(({x:bulletX, y:bulletY}))
+      layer.add(bullet);
+      layer.draw();
+      bulletDir = arrow.getRotation() * Math.PI/ 180;;
+
+      animBullet.start();
+    }
     
 
 
@@ -145,6 +182,15 @@ var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
       case 40:
         Vel = -1;
         break;  
+
+      case 32:
+        bVel = 5;
+        shoot();
+        setTimeout(function() {
+          animBullet.stop();
+          bullet.remove();
+        }, 2000);
+        break; 
     
       default:
         break;
