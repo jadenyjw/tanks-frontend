@@ -84,9 +84,10 @@ var bVel = 0;
 var bulletDir = 0.5;
 
 //Development
-//var ws = new WebSocket(" ws://localhost:8080/");
+var ws = new WebSocket(" ws://localhost:8080/");
+setInterval(function(){ws.send("")}, 10000);
 //Production
-var ws = new WebSocket(" wss://tanks.ml/ws");
+//var ws = new WebSocket(" wss://tanks.ml/ws");
 var tanks = [];
 
 function sendShoot(){
@@ -122,15 +123,15 @@ ws.onmessage = function (evt)
       tanks = data;
     }
 
-    if(evt.data[0] == 1){
+    if(header == 1){
       //Update position of the given tank
     }
     //Bullet Shot
-    else if(evt.data[1] == 2){
+    else if(header == 2){
       //Shoot from the given tank ID.
     }
     //Bullet Move
-    else if (evt.data[2] == 3){
+    else if (header == 3){
       //Update the position of the given bullet ID of the given tank ID.
     }
 }
