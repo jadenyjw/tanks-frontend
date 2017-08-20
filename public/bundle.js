@@ -84,9 +84,9 @@ var bVel = 0;
 var bulletDir = 0.5;
 
 //Development
-var ws = new WebSocket(" ws://localhost:8080/");
+//var ws = new WebSocket(" ws://localhost:8080/");
 //Production
-//var ws = new WebSocket(" wss://tanks.ml/ws");
+var ws = new WebSocket(" wss://tanks.ml/ws");
 var tanks = [];
 
 function sendShoot(){
