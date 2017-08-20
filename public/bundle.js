@@ -83,6 +83,58 @@ var arrowY = 0;
 var bVel = 0;
 var bulletDir = 0.5;
 
+//Development
+var ws = new WebSocket(" ws://localhost:8080/");
+//Production
+//var ws = new WebSocket(" wss://tanks.ml/ws");
+var tanks = [];
+
+function sendShoot(){
+  //Send tank shot the bullet
+  ws.send(0)
+}
+
+function sendMove(direction){
+  //Tank moves forward (1) or backward (0)
+  ws.send([1, direction]);
+}
+
+function sendRotate(direction){
+  //Rotates the tank, 1 for clockwise, 0 for counter-clockwise
+  ws.send([2, direction]);
+}
+
+
+ws.onmessage = function (evt)
+{
+
+
+
+    var message = JSON.parse(evt.data);
+    //Tank Join Update
+    var header = message[0];
+    var data = message[1];
+    console.log(message);
+
+    //Tank Sync
+    if(header == 0){
+      //This gets all the tanks along with all their bullets.
+      tanks = data;
+    }
+
+    if(evt.data[0] == 1){
+      //Update position of the given tank
+    }
+    //Bullet Shot
+    else if(evt.data[1] == 2){
+      //Shoot from the given tank ID.
+    }
+    //Bullet Move
+    else if (evt.data[2] == 3){
+      //Update the position of the given bullet ID of the given tank ID.
+    }
+}
+
 
 var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
   container: 'container',
@@ -125,7 +177,7 @@ var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
       var rotate = Rotate;
 
       var rotation = arrow.getRotation() * Math.PI/ 180;
-      
+
 
       x += vel * Math.cos(rotation);
       y += vel * Math.sin(rotation);;
@@ -144,7 +196,7 @@ var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
         var x = bullet.getX();
         var y = bullet.getY();
         var rotation = bulletDir;
-        
+
 
         x += bVel * Math.cos(rotation);
         y += bVel * Math.sin(rotation);
@@ -163,31 +215,30 @@ var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
       bulletDir = arrow.getRotation() * Math.PI/ 180;;
 
       animBullet.start();
+      sendShoot();
     }
-    
+
 
     document.addEventListener('keydown', function(event) {
 
     switch (event.keyCode) {
       case 65:
-        Rotate = -4;
+        sendRotate(0);
         break;
       case 	68:
-        Rotate = 4;
+        sendRotate(1);
         break;
       case 87:
-        Vel = width*0.002;
+        sendMove(1)
         break;
       case 	83:
-        Vel = -width*0.001;
-        break;  
+        sendMove(0)
+        break;
 
       case 67:
-        bVel = width*0.007;
-        shoot();
-        setTimeout(function(){animBullet.stop(); bullet.remove();}, 3000);
-        break; 
-    
+        sendShoot();
+        break;
+
       default:
         break;
     }
@@ -201,14 +252,14 @@ document.addEventListener('keyup', function(event) {
       Rotate = 0;
         break;
       case 68:
-      Rotate = 0;  
+      Rotate = 0;
         break;
       case 87:
-      Vel = 0;  
+      Vel = 0;
         break;
       case 83:
-      Vel = 0;    
-        break;  
+      Vel = 0;
+        break;
       default:
         break;
     }
@@ -220,10 +271,7 @@ document.addEventListener('keyup', function(event) {
 
 
 
-var tanksml = new WebSocket(" wss://tanks.ml/ws");
-tanksml.onopen = function (event) {
-  tanksml.send("hi beat boy"); 
-};
+
 
 /***/ }),
 /* 1 */
@@ -8335,8 +8383,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -8353,8 +8401,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -12859,8 +12907,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -12877,8 +12925,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13038,8 +13086,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13056,8 +13104,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13194,8 +13242,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13212,8 +13260,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13394,8 +13442,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13412,8 +13460,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13572,8 +13620,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13590,8 +13638,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13780,8 +13828,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13798,8 +13846,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13997,8 +14045,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -14015,8 +14063,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -14355,8 +14403,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -14373,8 +14421,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -15013,8 +15061,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -15031,8 +15079,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -15366,8 +15414,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -15384,8 +15432,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -15793,8 +15841,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -15811,8 +15859,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -16664,8 +16712,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -16682,8 +16730,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -17357,8 +17405,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -17375,8 +17423,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -17538,8 +17586,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -17556,8 +17604,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -18155,8 +18203,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Number} [config.fillPatternOffsetX]
+     * @param {Number} [config.fillPatternOffsetY]
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -18173,8 +18221,8 @@ tanksml.onopen = function (event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientEndPointX]
+     * @param {Number} [config.fillRadialGradientEndPointY]
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
