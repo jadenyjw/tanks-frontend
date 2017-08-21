@@ -95,10 +95,11 @@ var layer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer();
 stage.add(layer);
 
 //Development
-var ws = new WebSocket(" ws://localhost:8080/");
-setInterval(function(){ws.send("")}, 10000);
+//var ws = new WebSocket(" ws://localhost:8080/");
+
 //Production
-//var ws = new WebSocket(" wss://tanks.ml/ws");
+var ws = new WebSocket(" wss://tanks.ml/ws");
+setInterval(function(){ws.send("")}, 10000);
 var images = [];
 var bulletImages = [];
 
@@ -134,7 +135,7 @@ ws.onmessage = function (evt)
             x: data[i].x,
             y: data[i].y,
             id: data[i].id,
-            rotation: data[i].angle,
+            rotation: data[i].angle + 90,
             image: tankImage,
             width: 128,
             height: 128,
@@ -151,11 +152,9 @@ ws.onmessage = function (evt)
       console.log(data[0])
       images[data[0]].setX(data[1]);
       images[data[0]].setY(data[2]);
-      //images[data[0]].attrs.x = data[3];
-      //images[data[0]].attrs.y = data[4];
     }
     else if(header == 2){
-      images[data[0]].rotation(data[1]);
+      images[data[0]].rotation(data[1] + 90);
     }
     //Bullet Shot
     else if(header == 3){
@@ -193,83 +192,6 @@ ws.onmessage = function (evt)
 
     }
 }
-
-
-
-
-
-var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
-      x: width/2,
-      y: 15,
-      points: [0,0, width*0.02, 0],
-      pointerLength: width*0.01,
-      pointerWidth : width*0.01,
-      fill: 'black',
-      stroke: 'black',
-      strokeWidth: width*0.005
-    });
-
-  var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
-      x: arrowX,
-      y: arrowY,
-      radius: 4,
-      fill: 'red',
-      stroke: 'black',
-      strokeWidth: 1
-    });
-
-    layer.add(arrow);
-    // add the layer to the stage
-    stage.add(layer);
-
-
-    function updateArrow(frame){
-      var x = arrow.getX();
-      var y = arrow.getY();
-      var vel = Vel;
-      var rotate = Rotate;
-
-      var rotation = arrow.getRotation() * Math.PI/ 180;
-
-
-      x += vel * Math.cos(rotation);
-      y += vel * Math.sin(rotation);;
-
-      arrow.rotate(rotate);
-      arrow.setPosition({x:x, y:y});
-    }
-
-     var anim = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Animation(function(frame) {
-        updateArrow(frame);
-    }, layer);
-
-
-
-    var animBullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Animation(function(frame) {
-        var x = bullet.getX();
-        var y = bullet.getY();
-        var rotation = bulletDir;
-
-
-        x += bVel * Math.cos(rotation);
-        y += bVel * Math.sin(rotation);
-        bullet.setPosition({x:x, y:y});
-    }, layer);
-
-
-    anim.start();
-
-    function shoot(){
-      var bulletX = arrow.getX();
-      var bulletY = arrow.getY();
-      bullet.setPosition(({x:bulletX, y:bulletY}))
-      layer.add(bullet);
-      layer.draw();
-      bulletDir = arrow.getRotation() * Math.PI/ 180;;
-
-      animBullet.start();
-      sendShoot();
-    }
 
 
     document.addEventListener('keydown', function(event) {
