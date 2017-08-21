@@ -172,7 +172,7 @@ ws.onmessage = function (evt)
         x: data.x,
         y: data.y,
         id: data.id,
-        rotation: data.angle,
+        rotation: data.angle + 90,
         image: tankImage,
         width: 128,
         height: 128,
