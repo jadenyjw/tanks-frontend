@@ -73,8 +73,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_konva___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_konva__);
 
 
-var width = window.innerWidth * 0.8;
-var height = window.innerWidth * 0.4;
+const width = 800;
+const height = 800;
+var tankImage = new Image();
+tankImage.src = 'tank.png';
 
 var Vel = 0;
 var Rotate = 0;
@@ -83,12 +85,22 @@ var arrowY = 0;
 var bVel = 0;
 var bulletDir = 0.5;
 
+var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
+  container: 'container',
+  width: width,
+  height: height
+});
+
+var layer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer();
+stage.add(layer);
+
 //Development
 var ws = new WebSocket(" ws://localhost:8080/");
 setInterval(function(){ws.send("")}, 10000);
 //Production
 //var ws = new WebSocket(" wss://tanks.ml/ws");
-var tanks = [];
+var images = [];
+var bulletImages = [];
 
 function sendShoot(){
   //Send tank shot the bullet
@@ -108,9 +120,6 @@ function sendRotate(direction){
 
 ws.onmessage = function (evt)
 {
-
-
-
     var message = JSON.parse(evt.data);
     //Tank Join Update
     var header = message[0];
@@ -120,31 +129,74 @@ ws.onmessage = function (evt)
     //Tank Sync
     if(header == 0){
       //This gets all the tanks along with all their bullets.
-      tanks = data;
+      for(var i = 0, n = data.length; i < n; i++){
+          var image = new Konva.Image({
+            x: data[i].x,
+            y: data[i].y,
+            id: data[i].id,
+            rotation: data[i].angle,
+            image: tankImage,
+            width: 128,
+            height: 128,
+            offsetX: 64,
+            offsetY: 64
+          });
+        images.push(image);
+        layer.add(image);
+      }
     }
 
-    if(header == 1){
+    else if(header == 1){
       //Update position of the given tank
+      console.log(data[0])
+      images[data[0]].setX(data[1]);
+      images[data[0]].setY(data[2]);
+      //images[data[0]].attrs.x = data[3];
+      //images[data[0]].attrs.y = data[4];
+    }
+    else if(header == 2){
+      images[data[0]].rotation(data[1]);
     }
     //Bullet Shot
-    else if(header == 2){
+    else if(header == 3){
       //Shoot from the given tank ID.
     }
     //Bullet Move
-    else if (header == 3){
+    else if (header == 4){
       //Update the position of the given bullet ID of the given tank ID.
+    }
+
+    else if (header == 5){
+
+      //Tank joined.
+      var image = new Konva.Image({
+        x: data.x,
+        y: data.y,
+        id: data.id,
+        rotation: data.angle,
+        image: tankImage,
+        width: 128,
+        height: 128,
+        offsetX: 64,
+        offsetY: 64
+      });
+
+    images.push(image);
+    layer.add(image);
+
+    }
+
+    else if (header == 6){
+
+      images[data].destroy();
+      images.splice(data, 1);
+
     }
 }
 
 
-var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
-  container: 'container',
-  width: width,
-  height: height
-});
 
-var layer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer();
-var dragLayer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer();
+
 
 var arrow = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Arrow({
       x: width/2,
