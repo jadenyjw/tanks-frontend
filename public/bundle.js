@@ -75,7 +75,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 const width = window.innerWidth * 0.8;
 const height = window.innerWidth * 0.4;
-console.log(width + " " + height);
+
 var tankImage = new Image();
 tankImage.src = 'tank.svg';
 
@@ -129,11 +129,23 @@ function addObjects(data){
             offsetX: width/30,
             offsetY: height/30
           });
+          tanks.push(tank);
+          layer.add(tank);
 
         tank.bullets = data[i].bullets
-        tanks.push(tank);
-        layer.add(tank);
-
+        for(var x = 0, y = tank.bullets.length; x < y; x++){
+          var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
+            x: tank.bullets[x].x,
+            y: tank.bullets[x].y,
+            id: tank.bullets[x].id,
+            radius: width/800,
+            fill: 'red',
+            stroke: 'black',
+            strokeWidth: 1
+          });
+          tanks[i].bullets.push(bullet);
+          layer.add(bullet);
+        }
       }
 }
 
@@ -145,9 +157,7 @@ ws.onmessage = function (evt)
     var header = message[0];
     var data = message[1];
 
-
     //Tank Sync
-
     if(header == 0){
       //This gets all the tanks along with all their bullets.
       addObjects(data);
@@ -166,7 +176,6 @@ ws.onmessage = function (evt)
     }
     //Bullet Shot
     else if(header == 3){
-      console.log(data)
       //Shoot from the given tank ID.
       var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
         x: data[2],
@@ -182,11 +191,11 @@ ws.onmessage = function (evt)
     }
     //Bullet Move
     else if (header == 4){
-      console.log(data)
+      //console.log(data)
       //Update the position of the given bullet ID of the given tank ID.
-      tanks[data[0]].bullets[data[1]].setX(data[2]);
-      tanks[data[0]].bullets[data[1]].setY(data[3]);
 
+            tanks[data[0]].bullets[data[1]].setX(data[2]);
+            tanks[data[0]].bullets[data[1]].setY(data[3]);
     }
 
     else if (header == 5){
@@ -204,28 +213,29 @@ ws.onmessage = function (evt)
         offsetY: height/30
       });
 
-
-    tanks.push(tank);
-    layer.add(tank);
-    layer.draw();
+      tank.bullets = data.bullets
+      tanks.push(tank);
+      layer.add(tank);
 
     }
 
     else if (header == 6){
     //kills player objevt upon disconnect
+    for(var x = 0, n = tanks[data].bullets.length; x < n; x++){
+      tanks[data].bullets[x].destroy();
+    }
       tanks[data].destroy();
       tanks.splice(data, 1);
+
     }
 
     else if (header == 7){
-      //Destroy the bullet.
-      for(var x = 0, n = tanks[data[0]].bullets.length; x < n; x++){
-        if(tanks[data[0]].bullets[x].attrs.id == data[1]){
-          tanks[data[0]].bullets[x].destroy();
-          tanks[data[0]].bullets.splice(x, 1);
 
-        }
-      }
+
+          tanks[data[0]].bullets[data[1]].destroy();
+          tanks[data[0]].bullets.splice(data[1], 1);
+
+
     }
     layer.draw();
 }
