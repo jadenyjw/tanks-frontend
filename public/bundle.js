@@ -124,16 +124,16 @@ function addObjects(data){
             id: data[i].id,
             rotation: data[i].angle,
             image: tankImage,
-            width: 128,
-            height: 128,
-            offsetX: 64,
-            offsetY: 64
+            width: width/15,
+            height: height/15,
+            offsetX: width/30,
+            offsetY: height/30
           });
-        console.log(tank.isVisible());
-        console.log("wow")
+
+        tank.bullets = data[i].bullets
         tanks.push(tank);
         layer.add(tank);
-        console.log(layer);
+
       }
 }
 
@@ -144,14 +144,14 @@ ws.onmessage = function (evt)
     //Tank Join Update
     var header = message[0];
     var data = message[1];
-    console.log(message);
+
 
     //Tank Sync
 
     if(header == 0){
       //This gets all the tanks along with all their bullets.
       addObjects(data);
-      layer.draw();
+
     }
 
     else if(header == 1){
@@ -159,48 +159,49 @@ ws.onmessage = function (evt)
 
       tanks[data[0]].setX(data[1]);
       tanks[data[0]].setY(data[2]);
-      layer.draw();
+
     }
     else if(header == 2){
       tanks[data[0]].rotation(data[1]);
-      layer.draw();
     }
     //Bullet Shot
     else if(header == 3){
+      console.log(data)
       //Shoot from the given tank ID.
       var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
-        x: tanks[data[0]].getX(),
-        y: tanks[data[0]].getY(),
+        x: data[2],
+        y: data[3],
+        id: data[1],
         radius: width/800,
         fill: 'red',
         stroke: 'black',
         strokeWidth: 1
       });
-      bullets.push(bullet);
-      setTimeout(killBullet(), 3000);
-      layer.draw();
+      tanks[data[0]].bullets.push(bullet);
+      layer.add(bullet);
     }
     //Bullet Move
     else if (header == 4){
+      console.log(data)
       //Update the position of the given bullet ID of the given tank ID.
-      bullets[data[0]].setX(data[1]);
-      bullets[data[0]].setY(data[2]);
-      layer.draw();
+      tanks[data[0]].bullets[data[1]].setX(data[2]);
+      tanks[data[0]].bullets[data[1]].setY(data[3]);
+
     }
 
     else if (header == 5){
 
       //Tank joined.
      var tank = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Image({
-        x: data[i].x,
-        y: data[i].y,
-        id: data[i].id,
-        rotation: data[i].angle,
+        x: data.x,
+        y: data.y,
+        id: data.id,
+        rotation: data.angle,
         image: tankImage,
         width: width/15,
-        height: width/20,
+        height: height/15,
         offsetX: width/30,
-        offsetY: width/40
+        offsetY: height/30
       });
 
 
@@ -214,6 +215,17 @@ ws.onmessage = function (evt)
     //kills player objevt upon disconnect
       tanks[data].destroy();
       tanks.splice(data, 1);
+    }
+
+    else if (header == 7){
+      //Destroy the bullet.
+      for(var x = 0, n = tanks[data[0]].bullets.length; x < n; x++){
+        if(tanks[data[0]].bullets[x].attrs.id == data[1]){
+          tanks[data[0]].bullets[x].destroy();
+          tanks[data[0]].bullets.splice(x, 1);
+
+        }
+      }
     }
     layer.draw();
 }
@@ -278,10 +290,9 @@ document.addEventListener('keyup', function(event) {
     }
 });
 
-console.log(stage.isVisible());
-console.log(layer.isVisible());
 
-setInterval(function(){keyLoop()}, 10);
+
+setInterval(function(){keyLoop()}, 30);
 
 
 
