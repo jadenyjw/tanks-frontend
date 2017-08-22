@@ -73,17 +73,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_konva___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_konva__);
 
 
-const width = 800;
-const height = 800;
+const width = window.innerWidth * 0.8;;
+const height = window.innerWidth * 0.4;
 var tankImage = new Image();
-tankImage.src = 'tank.png';
+tankImage.src = 'Tank.svg';
 
-var Vel = 0;
-var Rotate = 0;
-var arrowX = 0;
-var arrowY = 0;
-var bVel = 0;
-var bulletDir = 0.5;
 
 var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
   container: 'container',
@@ -91,7 +85,7 @@ var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
   height: height
 });
 
-var layer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer();
+var layer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer;
 stage.add(layer);
 
 //Development
@@ -100,8 +94,11 @@ stage.add(layer);
 //Production
 var ws = new WebSocket(" wss://tanks.ml/ws");
 setInterval(function(){ws.send("")}, 10000);
-var images = [];
-var bulletImages = [];
+var tanks = [];
+var bullets = [];
+
+var moveState = -1; 
+var turnState = -1;
 
 function sendShoot(){
   //Send tank shot the bullet
@@ -118,6 +115,24 @@ function sendRotate(direction){
   ws.send([2, direction]);
 }
 
+function addObjects(data){
+  for(var i = 0, n = data.length; i < n; i++){
+          var tank = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Image({
+            x: data[i].x,
+            y: data[i].y,
+            id: data[i].id,
+            rotation: data[i].angle + 90,
+            image: tankImage,
+            width: width/15,
+            height: width/20,
+            offsetX: width/30,
+            offsetY: width/40
+          });
+        tanks.push(tank);
+        layer.add(tank);
+      }
+}
+
 
 ws.onmessage = function (evt)
 {
@@ -130,117 +145,127 @@ ws.onmessage = function (evt)
     //Tank Sync
     if(header == 0){
       //This gets all the tanks along with all their bullets.
-      for(var i = 0, n = data.length; i < n; i++){
-          var image = new Konva.Image({
-            x: data[i].x,
-            y: data[i].y,
-            id: data[i].id,
-            rotation: data[i].angle + 90,
-            image: tankImage,
-            width: 128,
-            height: 128,
-            offsetX: 64,
-            offsetY: 64
-          });
-        images.push(image);
-        layer.add(image);
-      }
+      addObjects(data);
     }
 
     else if(header == 1){
       //Update position of the given tank
       console.log(data[0])
-      images[data[0]].setX(data[1]);
-      images[data[0]].setY(data[2]);
+      tanks[data[0]].setX(data[1]);
+      tanks[data[0]].setY(data[2]);
     }
     else if(header == 2){
-      images[data[0]].rotation(data[1] + 90);
+      tanks[data[0]].rotation(data[1] + 90);
     }
     //Bullet Shot
     else if(header == 3){
       //Shoot from the given tank ID.
+      var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
+        x: tanks[data[0]].getX(),
+        y: tanks[data[0]].getY(),
+        radius: width/800,
+        fill: 'red',
+        stroke: 'black',
+        strokeWidth: 1
+      });
+      bullets.push(bullet);
+      setTimeout(killBullet(), 3000);
     }
     //Bullet Move
     else if (header == 4){
       //Update the position of the given bullet ID of the given tank ID.
+      bullets[data[0]].setX(data[1]);
+      bullets[data[0]].setY(data[2]);
     }
 
     else if (header == 5){
 
       //Tank joined.
-      var image = new Konva.Image({
-        x: data.x,
-        y: data.y,
-        id: data.id,
-        rotation: data.angle + 90,
+     var tank = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Image({
+        x: data[i].x,
+        y: data[i].y,
+        id: data[i].id,
+        rotation: data[i].angle + 90,
         image: tankImage,
-        width: 128,
-        height: 128,
-        offsetX: 64,
-        offsetY: 64
+        width: width/15,
+        height: width/20,
+        offsetX: width/30,
+        offsetY: width/40
       });
 
-    images.push(image);
-    layer.add(image);
+    tanks.push(tank);
+    layer.add(tank);
 
     }
 
     else if (header == 6){
-
-      images[data].destroy();
-      images.splice(data, 1);
+    //kills player objevt upon disconnect   
+      tanks[data].destroy();
+      tanks.splice(data, 1);
 
     }
 }
 
+function killBullet(){
+  //this is supposed to take the bullet shot and kill it automatically after 3 seconds to prevent memory leaks
+}
 
-    document.addEventListener('keydown', function(event) {
+function keyLoop(){
+  
+  if (turnstate != -1) {
+     sendRotate(turnState);    
+  }
+
+  if (moveState != -1){
+    sendMove(moveState);
+  }
+
+  setTimeout(keyLoop(), 30);
+}
+
+
+document.addEventListener('keydown', function(event) {
 
     switch (event.keyCode) {
       case 65:
-        sendRotate(0);
+        turnState = 0;
         break;
       case 	68:
-        sendRotate(1);
+        turnState = 1;
         break;
       case 87:
-        sendMove(1)
+        moveState = 1;
         break;
       case 	83:
-        sendMove(0)
+        moveState = 0;
         break;
-
       case 67:
         sendShoot();
         break;
-
       default:
         break;
     }
-    anim.start();
 });
 
 document.addEventListener('keyup', function(event) {
 
     switch (event.keyCode) {
       case 65:
-      Rotate = 0;
+      turnState = -1;
         break;
       case 68:
-      Rotate = 0;
+      turnState = -1;
         break;
       case 87:
-      Vel = 0;
+      moveState = -1;
         break;
       case 83:
-      Vel = 0;
+      moveState = -1;
         break;
       default:
         break;
     }
-    anim.start();
 });
-
 
 
 
@@ -8358,8 +8383,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -8376,8 +8401,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -12882,8 +12907,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -12900,8 +12925,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13061,8 +13086,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13079,8 +13104,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13217,8 +13242,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13235,8 +13260,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13417,8 +13442,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13435,8 +13460,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13595,8 +13620,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13613,8 +13638,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -13803,8 +13828,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -13821,8 +13846,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -14020,8 +14045,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -14038,8 +14063,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -14378,8 +14403,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -14396,8 +14421,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -15036,8 +15061,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -15054,8 +15079,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -15389,8 +15414,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -15407,8 +15432,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -15816,8 +15841,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -15834,8 +15859,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -16687,8 +16712,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -16705,8 +16730,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -17380,8 +17405,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -17398,8 +17423,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -17561,8 +17586,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -17579,8 +17604,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
@@ -18178,8 +18203,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillPatternX]
      * @param {Number} [config.fillPatternY]
      * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX]
-     * @param {Number} [config.fillPatternOffsetY]
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
      * @param {Object} [config.fillPatternScale] object with x and y component
      * @param {Number} [config.fillPatternScaleX]
      * @param {Number} [config.fillPatternScaleY]
@@ -18196,8 +18221,8 @@ document.addEventListener('keyup', function(event) {
      * @param {Number} [config.fillRadialGradientStartPointX]
      * @param {Number} [config.fillRadialGradientStartPointY]
      * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX]
-     * @param {Number} [config.fillRadialGradientEndPointY]
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
      * @param {Number} [config.fillRadialGradientStartRadius]
      * @param {Number} [config.fillRadialGradientEndRadius]
      * @param {Array} [config.fillRadialGradientColorStops] array of color stops
