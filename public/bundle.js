@@ -77,7 +77,7 @@ const width = window.innerWidth * 0.8;
 const height = window.innerWidth * 0.4;
 
 var tankImage = new Image();
-tankImage.src = 'tank.svg';
+tankImage.src = 'Tank.svg';
 
 
 var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
@@ -124,10 +124,10 @@ function addObjects(data){
             id: data[i].id,
             rotation: data[i].angle,
             image: tankImage,
-            width: width/15,
-            height: height/15,
-            offsetX: width/30,
-            offsetY: height/30
+            width: width/18,
+            height: height/18,
+            offsetX: width/36,
+            offsetY: height/36
           });
           tanks.push(tank);
           layer.add(tank);
@@ -138,9 +138,9 @@ function addObjects(data){
             x: tank.bullets[x].x,
             y: tank.bullets[x].y,
             id: tank.bullets[x].id,
-            radius: width/800,
+            radius: width/400,
             fill: 'red',
-            stroke: 'black',
+            stroke: 'red',
             strokeWidth: 1
           });
           tanks[i].bullets.push(bullet);
@@ -207,10 +207,10 @@ ws.onmessage = function (evt)
         id: data.id,
         rotation: data.angle,
         image: tankImage,
-        width: width/15,
-        height: height/15,
-        offsetX: width/30,
-        offsetY: height/30
+        width: width/18,
+        height: height/18,
+        offsetX: width/36,
+        offsetY: height/36
       });
 
       tank.bullets = data.bullets
