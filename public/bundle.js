@@ -73,8 +73,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_konva___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_konva__);
 
 
-const width = 1200;
-const height = 800;
+const width = window.innerWidth;
+const height = window.innerWidth/2;
+const scaleFactor = width/1600;
 Konva.pixelRatio = 1
 
 var tankImage = new Image();
@@ -127,15 +128,15 @@ function sendRotate(direction){
 function addObjects(data){
   for(var i = 0, n = data.length; i < n; i++){
           var tank = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Image({
-            x: data[i].x,
-            y: data[i].y,
+            x: data[i].x*scaleFactor,
+            y: data[i].y*scaleFactor,
             id: data[i].id,
             rotation: data[i].angle + 90,
             image: tankImage,
-            width: width/18,
-            height: width/18,
-            offsetX: width/36,
-            offsetY: width/36,
+            width: 64*scaleFactor,
+            height: 64*scaleFactor,
+            offsetX: 64*scaleFactor/2,
+            offsetY: 64*scaleFactor/2,
             listening: false
           });
           tanks.push(tank);
@@ -144,14 +145,14 @@ function addObjects(data){
         tank.bullets = data[i].bullets
         for(var x = 0, y = tank.bullets.length; x < y; x++){
           var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
-            x: tank.bullets[x].x,
-            y: tank.bullets[x].y,
-            id: tank.bullets[x].id,
-            radius: width/400,
-            fill: 'red',
-            stroke: 'red',
-            strokeWidth: 1,
-            listening: false
+              x: data[2]*scaleFactor,
+              y: data[3]*scaleFactor,
+              id: data[1],
+              radius: width/300,
+              fill: 'red',
+              stroke: 'red',
+              strokeWidth: 1,
+              listening: false
           });
           tanks[i].bullets.push(bullet);
           bulletLayer.add(bullet);
@@ -178,8 +179,8 @@ ws.onmessage = function (evt)
     else if(header == 1){
       //Update position of the given tank
 
-      tanks[data[0]].setX(data[1]);
-      tanks[data[0]].setY(data[2]);
+      tanks[data[0]].setX(data[1]*scaleFactor);
+      tanks[data[0]].setY(data[2]*scaleFactor);
       layer.batchDraw();
 
     }
@@ -191,12 +192,12 @@ ws.onmessage = function (evt)
     else if(header == 3){
       //Shoot from the given tank ID.
       var bullet = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Circle({
-        x: data[2],
-        y: data[3],
+        x: data[2]*scaleFactor,
+        y: data[3]*scaleFactor,
         id: data[1],
-        radius: width/800,
+        radius: width/300,
         fill: 'red',
-        stroke: 'black',
+        stroke: 'red',
         strokeWidth: 1,
         listening: false
       });
@@ -208,26 +209,26 @@ ws.onmessage = function (evt)
     else if (header == 4){
       //console.log(data)
       //Update the position of the given bullet ID of the given tank ID.
-            tanks[data[0]].bullets[data[1]].setX(data[2]);
-            tanks[data[0]].bullets[data[1]].setY(data[3]);
+            tanks[data[0]].bullets[data[1]].setX(data[2]*scaleFactor);
+            tanks[data[0]].bullets[data[1]].setY(data[3]*scaleFactor);
             bulletLayer.batchDraw();
     }
 
     else if (header == 5){
 
       //Tank joined.
-     var tank = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Image({
-        x: data.x,
-        y: data.y,
-        id: data.id,
-        rotation: data.angle + 90,
+    var tank = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Image({
+        x: data[i].x*scaleFactor,
+        y: data[i].y*scaleFactor,
+        id: data[i].id,
+        rotation: data[i].angle + 90,
         image: tankImage,
-        width: width/18,
-        height: width/18,
-        offsetX: width/36,
-        offsetY: width/36,
+        width: 64*scaleFactor,
+        height: 64*scaleFactor,
+        offsetX: 64*scaleFactor/2,
+        offsetY: 64*scaleFactor/2,
         listening: false
-      });
+    });
 
       tank.bullets = data.bullets
       tanks.push(tank);
