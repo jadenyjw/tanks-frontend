@@ -73,8 +73,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_konva___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_konva__);
 
 
-const width = window.innerWidth;
-const height = window.innerWidth/2;
+const width = window.innerWidth * 0.8;
+const height = window.innerWidth * 0.4;
 const scaleFactor = width/1600;
 Konva.pixelRatio = 1
 
