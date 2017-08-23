@@ -73,11 +73,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_konva___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_konva__);
 
 
-const width = window.innerWidth * 0.8;
-const height = window.innerWidth * 0.4;
+const width = 800;
+const height = 800;
 
 var tankImage = new Image();
-tankImage.src = 'Tank.svg';
+tankImage.src = 'tank.svg';
 
 
 var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
@@ -86,8 +86,15 @@ var stage = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Stage({
   height: height
 });
 
-var layer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer;
+var layer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer({
+  hitGraphEnabled: false
+});
 stage.add(layer);
+var bulletLayer = new __WEBPACK_IMPORTED_MODULE_0_konva___default.a.Layer({
+  hitGraphEnabled: false
+});
+stage.add(bulletLayer);
+
 
 //Development
 var ws = new WebSocket(" ws://localhost:8080/");
@@ -122,12 +129,13 @@ function addObjects(data){
             x: data[i].x,
             y: data[i].y,
             id: data[i].id,
-            rotation: data[i].angle,
+            rotation: data[i].angle + 90,
             image: tankImage,
             width: width/18,
-            height: height/18,
+            height: width/18,
             offsetX: width/36,
-            offsetY: height/36
+            offsetY: width/36,
+            listening: false
           });
           tanks.push(tank);
           layer.add(tank);
@@ -141,10 +149,11 @@ function addObjects(data){
             radius: width/400,
             fill: 'red',
             stroke: 'red',
-            strokeWidth: 1
+            strokeWidth: 1,
+            listening: false
           });
           tanks[i].bullets.push(bullet);
-          layer.add(bullet);
+          bulletLayer.add(bullet);
         }
       }
 }
@@ -161,7 +170,8 @@ ws.onmessage = function (evt)
     if(header == 0){
       //This gets all the tanks along with all their bullets.
       addObjects(data);
-
+      layer.batchDraw();
+      bulletLayer.batchDraw();
     }
 
     else if(header == 1){
@@ -169,10 +179,12 @@ ws.onmessage = function (evt)
 
       tanks[data[0]].setX(data[1]);
       tanks[data[0]].setY(data[2]);
+      layer.batchDraw();
 
     }
     else if(header == 2){
-      tanks[data[0]].rotation(data[1]);
+      tanks[data[0]].rotation(data[1] + 90);
+      layer.batchDraw();
     }
     //Bullet Shot
     else if(header == 3){
@@ -184,18 +196,20 @@ ws.onmessage = function (evt)
         radius: width/800,
         fill: 'red',
         stroke: 'black',
-        strokeWidth: 1
+        strokeWidth: 1,
+        listening: false
       });
       tanks[data[0]].bullets.push(bullet);
-      layer.add(bullet);
+      bulletLayer.add(bullet);
+      bulletLayer.batchDraw();
     }
     //Bullet Move
     else if (header == 4){
       //console.log(data)
       //Update the position of the given bullet ID of the given tank ID.
-
             tanks[data[0]].bullets[data[1]].setX(data[2]);
             tanks[data[0]].bullets[data[1]].setY(data[3]);
+            bulletLayer.batchDraw();
     }
 
     else if (header == 5){
@@ -205,39 +219,38 @@ ws.onmessage = function (evt)
         x: data.x,
         y: data.y,
         id: data.id,
-        rotation: data.angle,
+        rotation: data.angle + 90,
         image: tankImage,
         width: width/18,
-        height: height/18,
+        height: width/18,
         offsetX: width/36,
-        offsetY: height/36
+        offsetY: width/36,
+        listening: false
       });
 
       tank.bullets = data.bullets
       tanks.push(tank);
       layer.add(tank);
+      layer.draw();
 
     }
 
     else if (header == 6){
     //kills player objevt upon disconnect
-    for(var x = 0, n = tanks[data].bullets.length; x < n; x++){
-      tanks[data].bullets[x].destroy();
-    }
+      for(var x = 0, n = tanks[data].bullets.length; x < n; x++){
+        tanks[data].bullets[x].destroy();
+      }
       tanks[data].destroy();
       tanks.splice(data, 1);
-
+      layer.draw();
     }
 
     else if (header == 7){
-
-
           tanks[data[0]].bullets[data[1]].destroy();
           tanks[data[0]].bullets.splice(data[1], 1);
-
-
+          layer.draw();
     }
-    layer.draw();
+
 }
 
 function killBullet(){
