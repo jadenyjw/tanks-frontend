@@ -73,8 +73,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_konva___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_konva__);
 
 
-const width = 800;
+const width = 1200;
 const height = 800;
+Konva.pixelRatio = 1
 
 var tankImage = new Image();
 tankImage.src = 'tank.svg';
@@ -170,8 +171,8 @@ ws.onmessage = function (evt)
     if(header == 0){
       //This gets all the tanks along with all their bullets.
       addObjects(data);
-      layer.batchDraw();
-      bulletLayer.batchDraw();
+      layer.draw();
+      bulletLayer.draw();
     }
 
     else if(header == 1){
@@ -201,7 +202,7 @@ ws.onmessage = function (evt)
       });
       tanks[data[0]].bullets.push(bullet);
       bulletLayer.add(bullet);
-      bulletLayer.batchDraw();
+      bulletLayer.draw();
     }
     //Bullet Move
     else if (header == 4){
@@ -246,9 +247,9 @@ ws.onmessage = function (evt)
     }
 
     else if (header == 7){
-          tanks[data[0]].bullets[data[1]].destroy();
-          tanks[data[0]].bullets.splice(data[1], 1);
-          layer.draw();
+        tanks[data[0]].bullets[data[1]].destroy();
+        tanks[data[0]].bullets.splice(data[1], 1);
+        layer.draw();
     }
 
 }
@@ -315,7 +316,7 @@ document.addEventListener('keyup', function(event) {
 
 
 
-setInterval(function(){keyLoop()}, 30);
+setInterval(function(){keyLoop()}, 1);
 
 
 
