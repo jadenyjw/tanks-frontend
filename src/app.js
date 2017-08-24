@@ -7,6 +7,7 @@ const scaleFactor = width/1600;
 var app = new PIXI.Application(width, height, {backgroundColor : 0x1099bb});
 document.getElementById('container').appendChild(app.view);
 
+//Development
 var ws = new WebSocket(" ws://localhost:8080/");
 
 //Production
@@ -43,7 +44,7 @@ function addObjects(data){
         tank.height = 64*scaleFactor;
         tanks.push(tank);
         app.stage.addChild(tank);
-        console.log(tank.position)
+
 
         tank.bullets = data[i].bullets;
         for(var x = 0, y = tank.bullets.length; x < y; x++){
@@ -85,48 +86,45 @@ ws.onmessage = function (evt)
       var bullet = new PIXI.Graphics();
       bullet.lineStyle(0);
       bullet.beginFill(0xFFFF0B, 0.5);
-      console.log(data[2] * scaleFactor + " " + data[3]*scaleFactor);
       bullet.drawCircle(0, 0, 10*scaleFactor);
       bullet.endFill();
       app.stage.addChild(bullet);
-      console.log(bullet.position);
       tanks[data[0]].bullets.push(bullet);
 
 
     }
     //Bullet Move
     else if (header == 4){
-      //console.log(data)
       //Update the position of the given bullet ID of the given tank ID.
-      //console.log("wow" + data[2] * scaleFactor + " " + data[3]*scaleFactor);
       tanks[data[0]].bullets[data[1]].x = data[2]*scaleFactor;
       tanks[data[0]].bullets[data[1]].y = data[3]*scaleFactor;
     }
 
     else if (header == 5){
       var tank = PIXI.Sprite.fromImage('tank.svg');
-      tank.x = data[i].x*scaleFactor;
-      tank.y = data[i].y*scaleFactor;
+      tank.x = data.x*scaleFactor;
+      tank.y = data.y*scaleFactor;
       tank.anchor.set(0.5);
-      tank.rotation = (data[i].angle + 90) * (Math.PI / 180);
+      tank.rotation = (data.angle + 90) * (Math.PI / 180);
       tank.width = 64*scaleFactor;
       tank.height = 64*scaleFactor;
       tank.bullets = data.bullets
       tanks.push(tank);
       app.stage.addChild(tank);
+      console.log("aw");
     }
 
     else if (header == 6){
       for(var x = 0, n = tanks[data].bullets.length; x < n; x++){
-        tanks[data].bullets[x].destroy(true);
+        tanks[data].bullets[x].destroy();
       }
-      tanks[data].destroy(true);
+      tanks[data].destroy();
       tanks.splice(data, 1);
     }
 
     else if (header == 7){
       //projectile timeout
-      tanks[data[0]].bullets[data[1]].destroy(true);
+      tanks[data[0]].bullets[data[1]].destroy();
       tanks[data[0]].bullets.splice(data[1], 1);
     }
 
