@@ -20171,7 +20171,6 @@ var ws = new WebSocket(" ws://localhost:8080/");
 //var ws = new WebSocket(" wss://tanks.ml/ws");
 setInterval(function(){ws.send("")}, 10000);
 var tanks = [];
-var bullets = [];
 
 var moveState = -1;
 var turnState = -1;
@@ -20193,25 +20192,26 @@ function sendRotate(direction){
 
 function addObjects(data){
     for(var i = 0, n = data.length; i < n; i++){
-        var tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('Tanks.svg');
+        var tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('tank.svg');
         tank.x = data[i].x*scaleFactor;
         tank.y = data[i].y*scaleFactor;
         tank.anchor.set(0.5);
-        tank.rotation = data[i].angle + 90;
+        tank.rotation = (data[i].angle + 90) * (Math.PI / 180);
         tank.width = 64*scaleFactor;
         tank.height = 64*scaleFactor;
         tanks.push(tank);
         app.stage.addChild(tank);
+        console.log(tank.position)
 
         tank.bullets = data[i].bullets;
         for(var x = 0, y = tank.bullets.length; x < y; x++){
             var bullet = new __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Graphics"]();
             bullet.lineStyle(0);
             bullet.beginFill(0xFFFF0B, 0.5);
-            bullet.drawCircle(data[2]*scaleFactor, data[3]*scaleFactor, 10*scaleFactor);
+            bullet.drawCircle(data[2]*scaleFacto, data[3]*scaleFactor, 10*scaleFactor);
             bullet.endFill();
             tanks[i].bullets.push(bullet);
-            app.stafe.addChild(bullet);
+            app.stage.addChild(bullet);
         }
     }
 }
@@ -20230,11 +20230,12 @@ ws.onmessage = function (evt)
     }
 
     else if(header == 1){
+
       tanks[data[0]].x = (data[1]*scaleFactor);
       tanks[data[0]].y = (data[2]*scaleFactor);
     }
     else if(header == 2){
-      tanks[data[0]].rotation = data[1] + 90;
+      tanks[data[0]].rotation = (data[1] + 90) * (Math.PI / 180);
     }
     //Bullet Shot
     else if(header == 3){
@@ -20242,25 +20243,30 @@ ws.onmessage = function (evt)
       var bullet = new __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Graphics"]();
       bullet.lineStyle(0);
       bullet.beginFill(0xFFFF0B, 0.5);
-      bullet.drawCircle(data[2]*scaleFactor, data[3]*scaleFactor, 10*scaleFactor);
+      console.log(data[2] * scaleFactor + " " + data[3]*scaleFactor);
+      bullet.drawCircle(0, 0, 10*scaleFactor);
       bullet.endFill();
+      app.stage.addChild(bullet);
+      console.log(bullet.position);
       tanks[data[0]].bullets.push(bullet);
-      app.stafe.addChild(bullet);
-    }  
+
+
+    }
     //Bullet Move
     else if (header == 4){
       //console.log(data)
       //Update the position of the given bullet ID of the given tank ID.
+      //console.log("wow" + data[2] * scaleFactor + " " + data[3]*scaleFactor);
       tanks[data[0]].bullets[data[1]].x = data[2]*scaleFactor;
       tanks[data[0]].bullets[data[1]].y = data[3]*scaleFactor;
     }
 
     else if (header == 5){
-      var tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('Tanks.svg');
+      var tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('tank.svg');
       tank.x = data[i].x*scaleFactor;
       tank.y = data[i].y*scaleFactor;
       tank.anchor.set(0.5);
-      tank.rotation = data[i].angle + 90;
+      tank.rotation = (data[i].angle + 90) * (Math.PI / 180);
       tank.width = 64*scaleFactor;
       tank.height = 64*scaleFactor;
       tank.bullets = data.bullets
@@ -20287,20 +20293,19 @@ ws.onmessage = function (evt)
 
 //This controls keypresses
 function keyLoop(){
-    
-    
       if (turnState != -1) {
          sendRotate(turnState);
       }
-    
+
       if (moveState != -1){
         sendMove(moveState);
       }
-    }
-    
-    
+}
+
+  keyLoop();
+
     document.addEventListener('keydown', function(event) {
-    
+
         switch (event.keyCode) {
           case 65:
             turnState = 0;
@@ -20321,9 +20326,9 @@ function keyLoop(){
             break;
         }
     });
-    
+
     document.addEventListener('keyup', function(event) {
-    
+
         switch (event.keyCode) {
           case 65:
           turnState = -1;
@@ -20341,6 +20346,8 @@ function keyLoop(){
             break;
         }
     });
+setInterval(function(){keyLoop()}, 1);
+
 
 /***/ }),
 /* 88 */
