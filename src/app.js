@@ -35,7 +35,12 @@ function sendRotate(direction){
 
 function addObjects(data){
     for(var i = 0, n = data.length; i < n; i++){
+      if (i == n - 1){
+        var tank = PIXI.Sprite.fromImage('myTank.svg');
+      }
+      else{
         var tank = PIXI.Sprite.fromImage('tank.svg');
+      }
         tank.x = data[i].x*scaleFactor;
         tank.y = data[i].y*scaleFactor;
         tank.anchor.set(0.5);
@@ -109,10 +114,10 @@ ws.onmessage = function (evt)
       tank.rotation = (data.angle + 90) * (Math.PI / 180);
       tank.width = 64*scaleFactor;
       tank.height = 64*scaleFactor;
-      tank.bullets = data.bullets
+      tank.bullets = [];
       tanks.push(tank);
       app.stage.addChild(tank);
-      
+
     }
 
     else if (header == 6){
