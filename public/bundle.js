@@ -20193,7 +20193,13 @@
   
   function addObjects(data){
       for(var i = 0, n = data.length; i < n; i++){
-          var tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('tank.svg');
+          var tank;
+          if(i != (n - 1)){
+            tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('Tank.svg');
+          }
+          else if(i == (n - 1)){
+            tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('MyTank.svg');
+          }
           tank.x = data[i].x*scaleFactor;
           tank.y = data[i].y*scaleFactor;
           tank.anchor.set(0.5);
