@@ -31,19 +31,16 @@ class Head extends Component {
         textAlign: 'center',
         fontSize: '' + this.state.width * 0.05,
         fontFamily: 'Impact',
-        height: this.state.width * 0.055,
-        marginLeft: this.state.width * 0.05,
-        marginRight: this.state.width * 0.05,
+        height: this.state.width * 0.07,
         marginTop: 0,
         marginBottom: 0,
 
-        color: '#bcd8e2',
-        borderRadius: '5px 5px 5px 5px',
-        backgroundColor : '#00294c'
+        color: '#C5EFF7',
+        backgroundColor : '#22313f',
         };
 
         return(
-            <h1 className = 'head' style = {style}>Tanks.ml</h1>
+            <h1 className = 'head' style = {style} id= 'Head'>Tanks.ml</h1>
         );
 
     }
