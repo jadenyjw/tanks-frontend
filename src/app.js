@@ -8,10 +8,10 @@ var app = new PIXI.Application(width, height, {backgroundColor : 0x1099bb});
 document.getElementById('container').appendChild(app.view);
 
 //Development
-var ws = new WebSocket(" ws://localhost:8080/");
+//var ws = new WebSocket(" ws://localhost:8080/");
 
 //Production
-//var ws = new WebSocket(" wss://tanks.ml/ws");
+var ws = new WebSocket(" wss://tanks.ml/ws");
 setInterval(function(){ws.send("")}, 10000);
 var tanks = [];
 
@@ -159,7 +159,7 @@ function keyLoop(){
           case 	83:
             moveState = 0;
             break;
-          case 67:
+          case 32:
             sendShoot();
             break;
           default:

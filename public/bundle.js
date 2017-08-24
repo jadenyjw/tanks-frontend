@@ -20166,10 +20166,10 @@ var app = new __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Application"](width, height
 document.getElementById('container').appendChild(app.view);
 
 //Development
-var ws = new WebSocket(" ws://localhost:8080/");
+//var ws = new WebSocket(" ws://localhost:8080/");
 
 //Production
-//var ws = new WebSocket(" wss://tanks.ml/ws");
+var ws = new WebSocket(" wss://tanks.ml/ws");
 setInterval(function(){ws.send("")}, 10000);
 var tanks = [];
 
