@@ -20204,16 +20204,17 @@ function addObjects(data){
         app.stage.addChild(tank);
 
 
-        tank.bullets = data[i].bullets;
-        for(var x = 0, y = tank.bullets.length; x < y; x++){
+        tank.bullets = [];
+        for(var x = 0, y = data[i].bullets.length; x < y; x++){
             var bullet = new __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Graphics"]();
             bullet.lineStyle(0);
             bullet.beginFill(0xFFFF0B, 0.5);
-            bullet.drawCircle(data[2]*scaleFacto, data[3]*scaleFactor, 10*scaleFactor);
+            bullet.drawCircle(0, 0, 10*scaleFactor);
             bullet.endFill();
-            tanks[i].bullets.push(bullet);
+            tank.bullets.push(bullet);
             app.stage.addChild(bullet);
         }
+        console.log(tank.bullets)
     }
 }
 
@@ -20317,7 +20318,7 @@ function keyLoop(){
           case 	83:
             moveState = 0;
             break;
-          case 67:
+          case 32:
             sendShoot();
             break;
           default:

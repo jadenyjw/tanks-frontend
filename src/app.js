@@ -46,16 +46,17 @@ function addObjects(data){
         app.stage.addChild(tank);
 
 
-        tank.bullets = data[i].bullets;
-        for(var x = 0, y = tank.bullets.length; x < y; x++){
+        tank.bullets = [];
+        for(var x = 0, y = data[i].bullets.length; x < y; x++){
             var bullet = new PIXI.Graphics();
             bullet.lineStyle(0);
             bullet.beginFill(0xFFFF0B, 0.5);
-            bullet.drawCircle(data[2]*scaleFacto, data[3]*scaleFactor, 10*scaleFactor);
+            bullet.drawCircle(0, 0, 10*scaleFactor);
             bullet.endFill();
-            tanks[i].bullets.push(bullet);
+            tank.bullets.push(bullet);
             app.stage.addChild(bullet);
         }
+
     }
 }
 
@@ -111,7 +112,7 @@ ws.onmessage = function (evt)
       tank.bullets = data.bullets
       tanks.push(tank);
       app.stage.addChild(tank);
-      console.log("aw");
+      
     }
 
     else if (header == 6){
