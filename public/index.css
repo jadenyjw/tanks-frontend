@@ -6,8 +6,6 @@ body {
 }
 
 #container{
-  height:800px;
-  width:1200px;
-  margin: 0 auto;
-  background-color:white;
+  margin-left: 10vw;
+  margin-right: 10vw;
 }

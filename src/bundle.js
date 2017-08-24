@@ -20158,189 +20158,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_pixi_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_pixi_js__);
 
 
-const width = window.innerWidth * 0.8;
-const height = window.innerWidth * 0.4;
-const scaleFactor = width/1600;
-
-var app = new __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Application"](width, height, {backgroundColor : 0x1099bb});
+var app = new __WEBPACK_IMPORTED_MODULE_0_pixi_js___default.a.Application(800, 600, {backgroundColor : 0x1099bb});
 document.getElementById('container').appendChild(app.view);
 
-var ws = new WebSocket(" ws://localhost:8080/");
+// create a new Sprite from an image path
+var bunny = __WEBPACK_IMPORTED_MODULE_0_pixi_js___default.a.Sprite.fromImage('required/assets/basics/bunny.png')
 
-//Production
-//var ws = new WebSocket(" wss://tanks.ml/ws");
-setInterval(function(){ws.send("")}, 10000);
-var tanks = [];
-var bullets = [];
+// center the sprite's anchor point
+bunny.anchor.set(0.5);
 
-var moveState = -1;
-var turnState = -1;
+// move the sprite to the center of the screen
+bunny.x = app.renderer.width / 2;
+bunny.y = app.renderer.height / 2;
 
-function sendShoot(){
-  //Send tank shot the bullet
-  ws.send(0)
-}
+app.stage.addChild(bunny);
 
-function sendMove(direction){
-  //Tank moves forward (1) or backward (0)
-  ws.send([1, direction]);
-}
+// Listen for animate update
+app.ticker.add(function(delta) {
+    // just for fun, let's rotate mr rabbit a little
+    // delta is 1 if running at 100% performance
+    // creates frame-independent tranformation
+    bunny.rotation += 0.1 * delta;
+});
 
-function sendRotate(direction){
-  //Rotates the tank, 1 for clockwise, 0 for counter-clockwise
-  ws.send([2, direction]);
-}
-
-function addObjects(data){
-    for(var i = 0, n = data.length; i < n; i++){
-        var tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('Tanks.svg');
-        tank.x = data[i].x*scaleFactor;
-        tank.y = data[i].y*scaleFactor;
-        tank.anchor.set(0.5);
-        tank.rotation = data[i].angle + 90;
-        tank.width = 64*scaleFactor;
-        tank.height = 64*scaleFactor;
-        tanks.push(tank);
-        app.stage.addChild(tank);
-
-        tank.bullets = data[i].bullets;
-        for(var x = 0, y = tank.bullets.length; x < y; x++){
-            var bullet = new __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Graphics"]();
-            bullet.lineStyle(0);
-            bullet.beginFill(0xFFFF0B, 0.5);
-            bullet.drawCircle(data[2]*scaleFactor, data[3]*scaleFactor, 10*scaleFactor);
-            bullet.endFill();
-            tanks[i].bullets.push(bullet);
-            app.stafe.addChild(bullet);
-        }
-    }
-}
-
-ws.onmessage = function (evt)
-{
-    var message = JSON.parse(evt.data);
-    //Tank Join Update
-    var header = message[0];
-    var data = message[1];
-
-    //Tank Sync
-    if(header == 0){
-      //This gets all the tanks along with all their bullets.
-      addObjects(data);
-    }
-
-    else if(header == 1){
-      tanks[data[0]].x = (data[1]*scaleFactor);
-      tanks[data[0]].y = (data[2]*scaleFactor);
-    }
-    else if(header == 2){
-      tanks[data[0]].rotation = data[1] + 90;
-    }
-    //Bullet Shot
-    else if(header == 3){
-      //Shoot from the given tank ID.
-      var bullet = new __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Graphics"]();
-      bullet.lineStyle(0);
-      bullet.beginFill(0xFFFF0B, 0.5);
-      bullet.drawCircle(data[2]*scaleFactor, data[3]*scaleFactor, 10*scaleFactor);
-      bullet.endFill();
-      tanks[data[0]].bullets.push(bullet);
-      app.stafe.addChild(bullet);
-    }  
-    //Bullet Move
-    else if (header == 4){
-      //console.log(data)
-      //Update the position of the given bullet ID of the given tank ID.
-      tanks[data[0]].bullets[data[1]].x = data[2]*scaleFactor;
-      tanks[data[0]].bullets[data[1]].y = data[3]*scaleFactor;
-    }
-
-    else if (header == 5){
-      var tank = __WEBPACK_IMPORTED_MODULE_0_pixi_js__["Sprite"].fromImage('Tanks.svg');
-      tank.x = data[i].x*scaleFactor;
-      tank.y = data[i].y*scaleFactor;
-      tank.anchor.set(0.5);
-      tank.rotation = data[i].angle + 90;
-      tank.width = 64*scaleFactor;
-      tank.height = 64*scaleFactor;
-      tank.bullets = data.bullets
-      tanks.push(tank);
-      app.stage.addChild(tank);
-    }
-
-    else if (header == 6){
-      for(var x = 0, n = tanks[data].bullets.length; x < n; x++){
-        tanks[data].bullets[x].destroy(true);
-      }
-      tanks[data].destroy(true);
-      tanks.splice(data, 1);
-    }
-
-    else if (header == 7){
-      //projectile timeout
-      tanks[data[0]].bullets[data[1]].destroy(true);
-      tanks[data[0]].bullets.splice(data[1], 1);
-    }
-
-}
-
-
-//This controls keypresses
-function keyLoop(){
-    
-    
-      if (turnState != -1) {
-         sendRotate(turnState);
-      }
-    
-      if (moveState != -1){
-        sendMove(moveState);
-      }
-    }
-    
-    
-    document.addEventListener('keydown', function(event) {
-    
-        switch (event.keyCode) {
-          case 65:
-            turnState = 0;
-            break;
-          case 	68:
-            turnState = 1;
-            break;
-          case 87:
-            moveState = 1;
-            break;
-          case 	83:
-            moveState = 0;
-            break;
-          case 67:
-            sendShoot();
-            break;
-          default:
-            break;
-        }
-    });
-    
-    document.addEventListener('keyup', function(event) {
-    
-        switch (event.keyCode) {
-          case 65:
-          turnState = -1;
-            break;
-          case 68:
-          turnState = -1;
-            break;
-          case 87:
-          moveState = -1;
-            break;
-          case 83:
-          moveState = -1;
-            break;
-          default:
-            break;
-        }
-    });
 
 /***/ }),
 /* 88 */
