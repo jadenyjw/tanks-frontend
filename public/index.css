@@ -5,12 +5,36 @@ body {
   background-color: #34495E;
 }
 
-#container{
-  padding-top: 3vw;
-  text-align:center;
-  align-content: center;
+@font-face {
+  font-family: Munro;
+  src: url('/font/Munro.ttf');
+  font-weight:400;
 }
 
+#container{
+  padding-top: 0.3vw;
+  text-align:center;
+  align-content: center;
+  font-size: 40px
+}
+
+#topbar{
+  font-family: Munro, Impact;
+  text-align: center;
+  background-color: #22313f;
+}
+
+button{
+  font-family: Munro, Impact;
+  color: #FDE3A7;  
+  border-width: 0.4vw;
+  border-style: outset;
+  border-color:  #FDE3A7;
+}
+
+button:hover {
+  border-style: inset;
+}
 
 canvas{
 
@@ -20,5 +44,5 @@ canvas{
   border-right-style: inset;
   border-bottom-style: outset;
   border-left-style: outset;
-  border-color:  #336E7B;
+  border-color:  #FDE3A7;
 }

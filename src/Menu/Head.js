@@ -27,20 +27,71 @@ class Head extends Component {
     render() {
 
         const style = {
-        alignSelf: 'center',
-        textAlign: 'center',
-        fontSize: '' + this.state.width * 0.05,
-        fontFamily: 'Impact',
         height: this.state.width * 0.07,
-        marginTop: 0,
-        marginBottom: 0,
+        width: this.state.width *0.9,
+        margin: '0px',
 
-        color: '#C5EFF7',
-        backgroundColor : '#22313f',
+        color: '#FDE3A7',
+        
         };
 
+        const buttonStyle = {
+            backgroundColor:'#3E848D',
+
+            width: this.state.width / 8 + 'px',
+            height: this.state.width *0.05 + 'px',
+
+            textAlign: 'centre',
+            fontSize: this.state.width * 0.02 + 'px',
+            display: 'inline-block',
+
+            margin: this.state.width / 100 + 'px'
+        }
+        
+        const titleStyle = {
+            position: 'absolute',
+            top: this.state.width * 0.005   + 'px',
+            bottom: this.state.width * 0.005   + 'px',
+            left: this.state.width / 3 + 'px',
+            right: this.state.width/ 3 +'px',
+            fontSize:  this.state.width * 0.06   + 'px',
+            width: this.state.width / 3 + 'px',
+            display: 'inline-block',
+            horizontalAlign: 'center'
+        }
+
+        const bgroupStyleL= {
+            margin: '0px',
+            position: 'absolute',
+            left:'0px',
+            width: this.state.width / 3 + 'px',
+            display: 'inline-block',
+        }
+
+        const bgroupStyleR= {
+            margin: '0px',
+            position: 'absolute',
+            right:'0px',
+            width: this.state.width / 3 + 'px',
+            display: 'inline-block',
+        }
+
+
         return(
-            <h1 className = 'head' style = {style} id= 'Head'>Tanks.ml</h1>
+            <div style = {style}>
+                <div style = {bgroupStyleL}>
+                    <button style={buttonStyle}>placeholder</button>
+                    <button style={buttonStyle}>placeholder</button>
+                </div>
+                
+                <div style = {titleStyle}><b>Tanks.ml</b></div>
+                
+                <div style = {bgroupStyleR}>
+                    <button style={buttonStyle}>placeholder</button>
+                    <button style={buttonStyle}>placeholder</button>
+                </div >
+            </div>
+            
         );
 
     }

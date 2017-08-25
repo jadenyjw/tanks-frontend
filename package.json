@@ -16,7 +16,7 @@
     "build-bundle": "webpack ./src/app.js bundle.js"
   },
   "devDependencies": {
-    "webpack": "^3.5.5",
-    "pixi.js": "^4.5.4"
+    "pixi.js": "^4.5.4",
+    "webpack": "^3.5.5"
   }
 }
