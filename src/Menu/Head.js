@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Scroll, {scroller} from 'react-scroll';
 
 
 class Head extends Component {
@@ -8,6 +9,12 @@ class Head extends Component {
         super(props);
         this.state = { width: 0, height: 0 };
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.scrollToInstructions = this.scrollToInstructions.bind(this);
+    }
+
+    scrollToInstructions() {
+        var scrollAmount = this.state.width * 0.5;
+        Scroll.animateScroll.scrollTo(scrollAmount);
     }
 
     componentDidMount() {
@@ -80,7 +87,7 @@ class Head extends Component {
         return(
             <div style = {style}>
                 <div style = {bgroupStyleL}>
-                    <button style={buttonStyle}>placeholder</button>
+                    <button style={buttonStyle} onClick={this.scrollToInstructions}>Instructions</button>
                     <button style={buttonStyle}>placeholder</button>
                 </div>
                 

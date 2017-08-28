@@ -166,6 +166,9 @@ function keyLoop(){
             moveState = 0;
             break;
           case 32:
+            if(event.keyCode == 32 && event.target == document.body) {
+              event.preventDefault();
+            }
             sendShoot();
             break;
           default:
