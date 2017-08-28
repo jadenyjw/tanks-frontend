@@ -51,13 +51,14 @@ class Instructions extends Component {
                     SPACE BAR - shoot! <br/><br/>
 
                     <strong>Interesting Inqueries:</strong><br/>
+                    If pressing SPACE BAR scrolls you on this page, click the game canvas to grant it focus. The issue will be fixed.<br/>
                     This webpage is made to scale with most reasonable window sizes. If your computer's resolution is either 4:3 or 16:9, the webpage should scale correctly upon loading.
                     <br/>
                     If you encounter scaling issues, kindly attempt to refresh or clear cache to this page before using the bug report funtion to alert the developers!
                     Keep in mind kindly that we do not scale the game canvas upon window resize, even thought the rest of our webpage does. This is to keep the game's rendering reliable and hit detection accurate.
                     <br/> 
                     Upon updating our game, it is often neccessary that you clear cache and reload the page before the updated content will display correctly.
-                    More importantly, we will try to keep a copy of change log at ___________________________________.
+                    More importantly, we will try to keep a copy of change log at (somewhere).
                 </p>
             </div>
             

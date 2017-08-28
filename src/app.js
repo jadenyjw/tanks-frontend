@@ -17,6 +17,7 @@ var tanks = [];
 
 var moveState = -1;
 var turnState = -1;
+var shootState = -1;
 
 function sendShoot(){
   //Send tank shot the bullet
@@ -146,9 +147,13 @@ function keyLoop(){
       if (moveState != -1){
         sendMove(moveState);
       }
+
+      if (shootState = 1){
+        sendShoot();
+      }
 }
 
-  keyLoop();
+keyLoop();
 
     document.addEventListener('keydown', function(event) {
 
@@ -169,7 +174,7 @@ function keyLoop(){
             if(event.keyCode == 32 && event.target == document.body) {
               event.preventDefault();
             }
-            sendShoot();
+            shootState = 1;
             break;
           default:
             break;
@@ -191,8 +196,11 @@ function keyLoop(){
           case 83:
           moveState = -1;
             break;
+          case 32:
+            shootState = 0;
           default:
             break;
         }
     });
-setInterval(function(){keyLoop()}, 1);
+
+setInterval(function(){keyLoop()}, 10);
