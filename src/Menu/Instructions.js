@@ -9,6 +9,11 @@ class Instructions extends Component {
         super(props);
         this.state = { width: 0, height: 0 };
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.scrollToTop = this.scrollToTop.bind(this);
+    }
+
+    scrollToTop() {
+        Scroll.animateScroll.scrollToTop();
     }
 
     componentDidMount() {
@@ -27,7 +32,7 @@ class Instructions extends Component {
 
     render() {
         const style = {
-            height: this.state.width * 0.7,
+            height: this.state.width * 0.68,
             width: this.state.width *0.7,
             padding:'1vw',
             margin: '0px',
@@ -38,6 +43,18 @@ class Instructions extends Component {
 
             border: this.state.width * 0.01 + 'px outset #FDE3A7'
             };
+        const buttonStyle = {
+            backgroundColor:'#3E848D',
+
+            width: this.state.width / 8 + 'px',
+            height: this.state.width *0.05 + 'px',
+
+            textAlign: 'centre',
+            fontSize: this.state.width * 0.02 + 'px',
+            display: 'inline-block',
+
+            margin: this.state.width / 100 + 'px'
+        }
 
         return(
             <div style = {style} className = 'instruction'>
@@ -50,7 +67,7 @@ class Instructions extends Component {
                     D - turn tank right <br/>
                     SPACE BAR - shoot! <br/><br/>
 
-                    <strong>Interesting Inqueries:</strong><br/>
+                    <strong>Interesting Inqueries (psst, scroll down!):</strong><br/>
                     If pressing SPACE BAR scrolls you on this page, click the game canvas to grant it focus. The issue will be fixed.<br/>
                     This webpage is made to scale with most reasonable window sizes. If your computer's resolution is either 4:3 or 16:9, the webpage should scale correctly upon loading.
                     <br/>
@@ -60,6 +77,7 @@ class Instructions extends Component {
                     Upon updating our game, it is often neccessary that you clear cache and reload the page before the updated content will display correctly.
                     More importantly, we will try to keep a copy of change log at (somewhere).
                 </p>
+                <button style={buttonStyle} onClick={this.scrollToTop}>Back</button>
             </div>
             
         );
