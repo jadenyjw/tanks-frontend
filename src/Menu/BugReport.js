@@ -70,6 +70,19 @@ class BugReport extends React.Component {
         border: this.state.width * 0.01 + 'px outset #FDE3A7'
       };
 
+      const buttonStyle = {
+        backgroundColor:'#3E848D',
+
+        width: this.state.width / 8 + 'px',
+        height: this.state.width *0.05 + 'px',
+
+        textAlign: 'centre',
+        fontSize: this.state.width * 0.02 + 'px',
+        display: 'inline-block',
+
+        margin: this.state.width / 100 + 'px'
+    }
+
 
       let {imagePreviewUrl} = this.state;
       let $imagePreview = null;
@@ -81,6 +94,7 @@ class BugReport extends React.Component {
   
       return (
         <div className="previewComponent" style = {style}>
+          <h1>Bug Report</h1>
           <form onSubmit={(e)=>this._handleSubmit(e)}>
             <input className="fileInput" 
               type="file" 
@@ -93,9 +107,13 @@ class BugReport extends React.Component {
             {$imagePreview}
           </div>
           <textarea className="bugText">
-            Bug Description please; I expect a proper, grammatically correct paragraph.
+            Description of issue; I expect a proper, grammatically correct paragraph.
           </textarea>
-          <input type="submit" value="Submit" className="submitBug"/>
+          <div>
+            <input type="submit" value="Submit" className="submitBug" style = {buttonStyle} onClick={function(){window.alert('Submitted');}} />
+            <button style={buttonStyle} onClick={this.scrollToTop}>Back</button>
+          </div>
+         
         </div>
       )
     }
