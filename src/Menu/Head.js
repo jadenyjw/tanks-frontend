@@ -10,10 +10,15 @@ class Head extends Component {
         this.state = { width: 0, height: 0 };
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.scrollToInstructions = this.scrollToInstructions.bind(this);
+        this.scrollToBugReport = this.scrollToBugReport.bind(this);
     }
 
     scrollToInstructions() {
         var scrollAmount = this.state.width * 0.5;
+        Scroll.animateScroll.scrollTo(scrollAmount);
+    }
+    scrollToBugReport() {
+        var scrollAmount = this.state.width * 1.25;
         Scroll.animateScroll.scrollTo(scrollAmount);
     }
 
@@ -88,7 +93,7 @@ class Head extends Component {
             <div style = {style}>
                 <div style = {bgroupStyleL}>
                     <button style={buttonStyle} onClick={this.scrollToInstructions}>Instructions</button>
-                    <button style={buttonStyle}>placeholder</button>
+                    <button style={buttonStyle} onClick={this.scrollToBugReport}>Bug Report</button>
                 </div>
                 
                 <div style = {titleStyle}><b>Tanks.ml</b></div>
