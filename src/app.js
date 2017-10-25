@@ -185,16 +185,16 @@ keyLoop();
 
         switch (event.keyCode) {
           case 65:
-          turnState = -1;
+            turnState = -1;
             break;
           case 68:
-          turnState = -1;
+            turnState = -1;
             break;
           case 87:
-          moveState = -1;
+            moveState = -1;
             break;
           case 83:
-          moveState = -1;
+            moveState = -1;
             break;
           case 32:
             shootState = 0;
